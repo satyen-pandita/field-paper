@@ -14,6 +14,7 @@ using LinearAlgebra;
 
 # Random.seed!(12345)
 
+# Added another comment here
 @with_kw mutable struct Primitives
     # externally chosen params 
     ϕ::Float64 = 0.5963

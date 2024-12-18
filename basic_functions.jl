@@ -77,6 +77,7 @@ function action_set(prim::Primitives, smm_params::smm_parameters)
     return actions 
 end
 
+# Added a new comment here
 
 function HH_types(prim::Primitives, smm_params::smm_parameters, 
                   sc_active::Bool)
