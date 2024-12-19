@@ -169,14 +169,11 @@ end
 
 
 function optim_func(guess::Vector{Float64}, 
-                    sc_active::Bool)
+                    sc_active::Bool, home_prod::Bool)
     if minimum(guess) < 0 
         return 1e15
     end
-    if sum(guess[1:2]) > 1
-        return 1e15
-    end
-    prim, smm_params = Initialize(guess, sc_active)
+    prim, smm_params = Initialize(guess, sc_active, home_prod)
     emp_mean_dict, emp_var_dict, time_alloc_mean_dict, time_alloc_var_dict = gen_moments(prim, smm_params, sc_active);
     
     mean_vec = vcat(time_alloc_mean_dict["work"], emp_mean_dict["North"], emp_mean_dict["South"])
@@ -191,14 +188,11 @@ function optim_func(guess::Vector{Float64},
 end
 
 function optim_func_w_optimal_weights(guess::Vector{Float64}, var::Vector{Float64}, 
-                                      sc_active::Bool)
+                                      sc_active::Bool, home_prod::Bool)
     if minimum(guess) < 0 
         return 1e15
     end
-    if sum(guess[1:2]) > 1
-        return 1e15
-    end
-    prim, smm_params = Initialize(guess, sc_active)
+    prim, smm_params = Initialize(guess, sc_active, home_prod)
     emp_mean_dict, emp_var_dict, time_alloc_mean_dict, time_alloc_var_dict = gen_moments(prim, smm_params, sc_active);
     
     mean_vec = vcat(time_alloc_mean_dict["work"], emp_mean_dict["North"], emp_mean_dict["South"])
@@ -217,8 +211,6 @@ function HH_dist(prim::Primitives, smm_params::smm_parameters)
 
 
 end
-
-# With optimal var-covar matrix
 
 # TODO: NEEDS UPDATIONS - AM I THINKING ABOUT ELASTICITY RIGHT?
 function lab_e(prim::Primitives, smm_params::smm_parameters, 

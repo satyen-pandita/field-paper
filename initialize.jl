@@ -84,20 +84,28 @@ end
 
 
 function Initialize(guess::Vector{Float64}, 
-                    sc_active::Bool)
+                    sc_active::Bool, home_prod::Bool=false)
     prim = Primitives()
     if sc_active
-        η_m, η_f, sc_north, sc_south = guess
-        # A_m, A_f, sc_north, sc_south = guess
-        
+        if home_prod
+            A_m, A_f, sc_north, sc_south = guess
+            η_m, η_f = 1/3, 1/3
+        else 
+            η_m, η_f, sc_north, sc_south = guess
+            A_m, A_f = 1., 1.
+        end        
     else 
-        η_m, η_f = guess
-        # A_m, A_f = guess
+        if home_prod
+            A_m, A_f = guess
+            η_m, η_f = 1/3, 1/3
+        else 
+            η_m, η_f = guess
+            A_m, A_f = 1.0, 1.0
+        end
         sc_north = 0.0
-        sc_south = 0.0    
+        sc_south = 0.0
     end
-    # η_m, η_f = 1/3,1/3
-    A_m, A_f = 1.0, 1.0
+    # A_m, A_f = 1.0, 1.0
     smm_params = smm_parameters(A_m, A_f, η_m, η_f, sc_north, sc_south)
     return prim, smm_params
 end
