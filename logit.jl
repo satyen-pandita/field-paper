@@ -21,15 +21,22 @@ function prob_actions_hh(prim::Primitives, smm_params::smm_parameters,
     homeProds = [H(prim, smm_params, actions[i][5], actions[i][6], incomes[i]) for i in 1:nactions]
     conss = [c(prim, incomes[i], homeProds[i]) for i in 1:nactions]
     utils = [u(prim, smm_params, hh_type, conss[i], 
-             actions[i][3], actions[i][4], actions[i][6]) for i in 1:nactions]
+             actions[i][3], actions[i][4], actions[i][6], homeProds[i]) for i in 1:nactions]
     # Exponentiate Utilities 
     exp_utils = [exp(util) for util in utils]
-    # Find probability of each action 
-    probs = [e/(sum(exp_utils)) for e in exp_utils]
+    if sum(exp_utils) == 0
+        probs = zeros(nactions)
+        # If all probs are 0, then return p = 1 on action where leisure is 1
+        act_rest = findfirst(==([0.0,0.0,1.0,1.0,0.0,0.0]), actions)
+        probs[act_rest] = 1.0
+    else 
+        # Find probability of each action 
+        probs = [e/(sum(exp_utils)) for e in exp_utils]
+    end
     return probs
 end
 
-# Draw N draws from the probab distribution obtained from prob_actions_hh for each HH
+# Draw N draws from the prob distribution obtained from prob_actions_hh for each HH
 function action_idx_hh(prim::Primitives, smm_params::smm_parameters,
     hh_type::HH_Type, N::Int64=500)
     @unpack_Primitives prim

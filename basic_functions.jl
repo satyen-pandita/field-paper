@@ -1,11 +1,11 @@
 # Consumption Function 
 function c(prim::Primitives, I::Float64, H::Float64)
     @unpack_Primitives prim 
-    if I < 0 || H < 0 
+    if I < 0
         return -1.0
     end
-    # if H < 0
-    return (((1-ψ)*I)^ω + H^ω)^(1/ω)
+    return (1-ψ)*I
+    # return (((1-ψ)*I)^ω + H^ω)^(1/ω)
 end
 
 # Home Production function 
@@ -15,12 +15,6 @@ function H(prim::Primitives, smm_params::smm_parameters,
     @unpack_smm_parameters smm_params
     male = A_m*hp_m
     female = A_f*hp_f
-    # if male < 0
-    #     male = 0
-    # end
-    # if female < 0 
-    #     female = 0
-    # end
     if I < 0 
         return -1.0
     end
@@ -28,25 +22,22 @@ function H(prim::Primitives, smm_params::smm_parameters,
 end
 
 function u(prim::Primitives, smm_params::smm_parameters, hh_type::HH_Type,
-            cons::Float64, lm::Float64, lf::Float64, hp_f::Float64)
+            cons::Float64, lm::Float64, lf::Float64, hp_f::Float64, H::Float64)
     @unpack_Primitives prim
     @unpack_smm_parameters smm_params
     @unpack_HH_Type hh_type
     # Any time spent outside leisure and home production 
     # imposes a cost on the HH. I assume job search and work happens
     # outside the house. No work-from-home or  search online.job 
-    if cons < 0 
+    if cons <= 0 || lm <= 0 || lf <= 0 || H <= 0
         return -1e10 
     end
     out_time = (1.0-lf-hp_f)
-    # I need to impose stigma cost by picking it up 
-    # from the HH Type now. 
-    # sc = sc_south
-    # if north == 1
-    #     sc = sc_north  
-    # end
+
     # return (1-η_m-η_f)*log(cons) + η_m*log(lm) + η_f*log(lf) - sc*out_time^2
-    return ((1-η_m-η_f)/(1-σ_c))*cons^(1-σ_c) + (η_m/(1-σl_m))*lm^(1-σl_m) + (η_f/(1-σl_f))*lf^(1-σl_f) - sc*(out_time > 0)
+    
+    return log(cons) + log(lm) + log(lf) + log(H) - sc*(out_time>0)
+    # ((1-η_m-η_f)/(1-σ_c))*cons^(1-σ_c) + (η_m/(1-σl_m))*lm^(1-σl_m) + (η_f/(1-σl_f))*lf^(1-σl_f) - sc*(out_time > 0)
 end
 
 # Set of all possible actions 
