@@ -32,6 +32,7 @@ function prob_actions_hh(prim::Primitives, smm_params::smm_parameters,
         # Find probability of each action 
         probs = [e/(sum(exp_utils)) for e in exp_utils]
     end
+    return probs
 end
 
 # Draw N draws from the probab distribution obtained from prob_actions_hh for each HH
