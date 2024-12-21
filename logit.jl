@@ -24,9 +24,14 @@ function prob_actions_hh(prim::Primitives, smm_params::smm_parameters,
              actions[i][3], actions[i][4], actions[i][6]) for i in 1:nactions]
     # Exponentiate Utilities 
     exp_utils = [exp(util) for util in utils]
-    # Find probability of each action 
-    probs = [e/(sum(exp_utils)) for e in exp_utils]
-    return probs
+    if sum(exp_utils) == 0
+        rest_idx = findfirst(==([0.0,0.0,1.0,1.0,0.0,0.0]), actions)
+        probs = zeros(nactions)
+        probs[rest_idx] = 1.0
+    else
+        # Find probability of each action 
+        probs = [e/(sum(exp_utils)) for e in exp_utils]
+    end
 end
 
 # Draw N draws from the probab distribution obtained from prob_actions_hh for each HH
