@@ -45,8 +45,8 @@ function u(prim::Primitives, smm_params::smm_parameters, hh_type::HH_Type,
     # if north == 1
     #     sc = sc_north  
     # end
-    # return (1-η_m-η_f)*log(cons) + η_m*log(lm) + η_f*log(lf) - sc*out_time^2
-    return ((1-η_m-η_f)/(1-σ_c))*cons^(1-σ_c) + (η_m/(1-σl_m))*lm^(1-σl_m) + (η_f/(1-σl_f))*lf^(1-σl_f) - sc*(out_time > 0)
+    return (1-η_m-η_f)*log(cons) + η_m*log(lm) + η_f*log(lf) - sc*(out_time>0)
+    # return ((1-η_m-η_f)/(1-σ_c))*cons^(1-σ_c) + (η_m/(1-σl_m))*lm^(1-σl_m) + (η_f/(1-σl_f))*lf^(1-σl_f) - sc*(out_time > 0)
 end
 
 # Set of all possible actions 
