@@ -35,7 +35,7 @@ function u(prim::Primitives, smm_params::smm_parameters, hh_type::HH_Type,
     # Any time spent outside leisure and home production 
     # imposes a cost on the HH. I assume job search and work happens
     # outside the house. No work-from-home or  search online.job 
-    if cons < 0 
+    if cons <= 0 || lm <= 0 || lf <= 0
         return -1e10 
     end
     out_time = (1.0-lf-hp_f)
