@@ -65,7 +65,7 @@ for sc in [true, false]
 end
 
 # Output to a file
-open("results.jls", "w+") do f
+open("results_mu.jls", "w+") do f
     serialize(f, res)
 end
 
