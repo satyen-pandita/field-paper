@@ -56,8 +56,9 @@ using LinearAlgebra;
     
     # Ordering: sc = 0, sc > 0, sc = ∞
     # HH_wts_stigma = Dict("North" => [0.46, 0.24, 0.30], "South" => [0.70, 0.12, 0.18])
-    HH_wts_stigma = Dict("North" => [0.62, 0.18, 0.20], "South" => [0.55, 0.15, 0.30])
-    # HH_wts_stigma = Dict("North" => [0.0, 1.0, 0.0], "South" => [0.0, 1.0, 0.0])
+    # HH_wts_stigma = Dict("North" => [0.62, 0.18, 0.20], "South" => [0.55, 0.15, 0.30])
+    HH_wts_stigma = Dict("North" => [0.62, 0.18, 0.20], "South" => [1.0, 0.0, 0.0])
+    
 end
                            
 # These parameters will be estimated using SMM
