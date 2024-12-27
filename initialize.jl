@@ -56,8 +56,8 @@ using LinearAlgebra;
     
     # Ordering: sc = 0, sc > 0, sc = ∞
     
-    HH_wts_stigma = Dict("North" => [0.62, 0.18, 0.20], "South" => [0.55, 0.15, 0.30])
-    # HH_wts_stigma = Dict("North" => [0.62, 0.18, 0.20], "South" => [1.0, 0.0, 0.0])
+    # HH_wts_stigma = Dict("North" => [0.62, 0.18, 0.20], "South" => [0.55, 0.15, 0.30])
+    HH_wts_stigma = Dict("North" => [0.62, 0.18, 0.20], "South" => [1.0, 0.0, 0.0])
     
 end
                            
