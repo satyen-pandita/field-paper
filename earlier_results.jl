@@ -1,18 +1,10 @@
-
-
-
-
-# Without modified utility (newest)
-# (true, true)  => ([0.00498952, 172.283, 28.2292, 0.0714194], 4.09295)
-# (false, true) => ([0.0839646, 537.476], 4.66374)
-
-# Without modified utility(Used in the write-up)
+# With modified utility(Used in the write-up)
 # res = Dict(false => ([0.122717, 71.3624], 4.08059), true  => ([0.0201509, 19.4524, 5.81422, 0.0453233], 3.6617))
 
+# Without modified utility (Used in the write-up)
 
-# Results with modified utility (but no stigma in the South) - will write about this.
-# res = Dict(false => ([0.122717, 71.3624], 4.08059), true  => ([0.0201509, 19.4524, 5.81422, 0.0453233], 3.6617))
-
+# (true, true)  => ([0.0104459, 246.477, 8.75865, 0.0246987], 4.06506)
+# (false, true) => ([0.160803, 5918.72], 4.21093)
 
 # Results with modified utility (but with stigma in the South too) - will write about this.
 
