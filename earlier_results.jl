@@ -1,6 +1,7 @@
 
 
 # With modified utility(Used in the write-up)
+# false => ([0.0724101, 36.9881], 4.04397) - gives better results for False
 # res = Dict(false => ([0.122717, 71.3624], 4.08059), true  => ([0.0201509, 19.4524, 5.81422, 0.0453233], 3.6617))
 
 # Without modified utility (Used in the write-up)

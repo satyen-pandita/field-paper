@@ -18,7 +18,7 @@ using LinearAlgebra;
 @with_kw mutable struct Primitives
     # externally chosen params 
     ϕ::Float64 = 0.5963
-    ω::Float64 = 0.99
+    ω::Float64 = 0.44
     ψ::Float64 = 0.39
     σl_m::Float64 = 0.9448
     σl_f::Float64 = 0.9657
