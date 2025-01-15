@@ -1,6 +1,6 @@
-# using Pkg
-# Pkg.add(["SharedArrays", "Parameters", "Distributions", "Random", 
-            # "Serialization", "Optim", "StatsBase", "Statistics"])
+using Pkg
+Pkg.add(["SharedArrays", "Parameters", "Distributions", "Random", 
+            "Serialization", "Optim", "StatsBase", "Statistics", "BenchmarkTools", "LinearAlgebra"])
 using SharedArrays
 using Parameters
 using Distributions 
@@ -28,6 +28,8 @@ using LinearAlgebra;
     # any differences in home prod and leisure hrs
     # stems solely from differences in A_m, A_f 
     h::Float64 = 0.593
+    hm::Float64 = 0.628
+    hf::Float64 = 0.398
     # Leisure grid
     # N_l::Int64 = 30
     dl::Float64 = 0.1

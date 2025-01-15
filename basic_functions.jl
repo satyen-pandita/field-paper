@@ -58,10 +58,10 @@ function action_set(prim::Primitives, smm_params::smm_parameters)
     for dm in Dm, df in Df
         nl_m = (dm == 1)*Nl_work  + (dm == 0)*N_l
         nl_f = (df == 1)*Nl_work  + (df == 0)*N_l
-        leisure_m = collect(range(0.0, 1.0-dm*h, nl_m))
-        leisure_f = collect(range(0.0, 1.0-df*h, nl_f))
+        leisure_m = collect(range(0.0, 1.0-dm*hm, nl_m))
+        leisure_f = collect(range(0.0, 1.0-df*hf, nl_f))
         for lm in leisure_m, lf in leisure_f
-            actions[i] = [dm, df, lm, lf, 1.0-dm*h-lm, 1.0-df*h-lf]
+            actions[i] = [dm, df, lm, lf, 1.0-dm*hm-lm, 1.0-df*hf-lf]
             i += 1
         end
     end

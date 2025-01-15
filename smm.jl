@@ -36,7 +36,7 @@ function multiple_starts(n::Int64, sc_active::Bool, home_prod::Bool, max_iter::I
         end
         optim_f = guess -> optim_func(guess, sc_active, home_prod)
         # init = [0.4674, 0.00393, 9.92663, 0.04971]
-        opt = optimize(optim_f, init, NelderMead(), Optim.Options(iterations=max_iter))
+        opt = optimize(optim_f, init, NelderMead(), Optim.Options(iterations=max_iter, show_trace=true, show_every=1))
         Min_y[i] = opt.minimum
         Min_x[i,:] = opt.minimizer
         @show i    
@@ -52,20 +52,23 @@ function optimum_w_optimal_weights(n::Int64, sc_active::Bool, home_prod::Bool, m
     emp_mean_dict, emp_var_dict, time_alloc_mean_dict, time_alloc_var_dict = gen_moments(prim, smm_params, sc_active);
     var_vec = vcat(time_alloc_var_dict["work"], emp_var_dict["North"], emp_var_dict["South"])
     optim_f = guess -> optim_func_w_optimal_weights(guess, var_vec, sc_active, home_prod)
-    opt = optimize(optim_f, vec(x_min), NelderMead(), Optim.Options(iterations=max_iter))
+    opt = optimize(optim_f, vec(x_min), NelderMead(), Optim.Options(iterations=max_iter, show_trace=true, show_every=1))
     Min_x_f, Min_y_f = opt.minimizer, opt.minimum
     return Min_x_f, Min_y_f
 end
 
 # Save the results in a dictionary
 res = Dict()
-for sc in [true, false]
-    Min_x_f, Min_y_f = optimum_w_optimal_weights(30, sc, true, 250)
+for sc in [true, false], home in [true]
+    Min_x_f, Min_y_f = optimum_w_optimal_weights(20, sc, home, 200)
     res[(sc, home)] = (Min_x_f, Min_y_f)
 end
 
+using Dates 
+ts = Dates.format(now(), "yyyy_mm_dd_HH_MM")
+fname = "results_mu_$ts.jls"
 # Output to a file
-open("results_mu.jls", "w+") do f
+open(fname, "w+") do f
     serialize(f, res)
 end
 

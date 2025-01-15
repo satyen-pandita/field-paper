@@ -17,7 +17,7 @@ function prob_actions_hh(prim::Primitives, smm_params::smm_parameters,
     nactions = length(actions);
     # For each of these actions, calculate income, home production 
     # Consumption and finally, utilities 
-    incomes = [wm*actions[i][1] + wf*actions[i][2] for i in 1:nactions]
+    incomes = [wm*actions[i][1]*hm + wf*actions[i][2]*hf for i in 1:nactions]
     homeProds = [H(prim, smm_params, actions[i][5], actions[i][6], incomes[i]) for i in 1:nactions]
     conss = [c(prim, incomes[i], homeProds[i]) for i in 1:nactions]
     utils = [u(prim, smm_params, hh_type, conss[i], 
