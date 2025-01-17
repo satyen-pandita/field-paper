@@ -36,7 +36,7 @@ function u(prim::Primitives, smm_params::smm_parameters, hh_type::HH_Type,
 
     # return (1-η_m-η_f)*log(cons) + η_m*log(lm) + η_f*log(lf) - sc*out_time^2
     
-    return log(cons) + log(lm) + log(lf) + log(H) - sc*(out_time>0)
+    return log(cons) + η_m*log(lm) + η_f*log(lf) + log(H) - sc*(out_time>0)
     # ((1-η_m-η_f)/(1-σ_c))*cons^(1-σ_c) + (η_m/(1-σl_m))*lm^(1-σl_m) + (η_f/(1-σl_f))*lf^(1-σl_f) - sc*(out_time > 0)
 end
 
@@ -46,7 +46,7 @@ function action_set(prim::Primitives, smm_params::smm_parameters)
     @unpack_Primitives prim
     @unpack_smm_parameters smm_params
     # Possible actions depend on whether the agent is working/not-working
-    N = N_l^2 + 2*Nl_work*N_l + Nl_work^2
+    N = Nl_work_m*Nl_work_f + Nl_work_m*N_l + N_l*Nl_work_f + N_l^2
     # Dm, Df, Lm, Lf, Hpm, Hpf
     # The ordering here will be: Dm,Df = [0,0], [0,1], [1,0], [1,1]
     actions = [zeros(6) for _ in 1:N];
@@ -56,8 +56,8 @@ function action_set(prim::Primitives, smm_params::smm_parameters)
     i = 1
     # Enumerate all actions: (Dm, Df, Lm, Lf, Hpm, Hpf)
     for dm in Dm, df in Df
-        nl_m = (dm == 1)*Nl_work  + (dm == 0)*N_l
-        nl_f = (df == 1)*Nl_work  + (df == 0)*N_l
+        nl_m = (dm == 1)*Nl_work_m  + (dm == 0)*N_l
+        nl_f = (df == 1)*Nl_work_f  + (df == 0)*N_l
         leisure_m = collect(range(0.0, 1.0-dm*hm, nl_m))
         leisure_f = collect(range(0.0, 1.0-df*hf, nl_f))
         for lm in leisure_m, lf in leisure_f
@@ -67,8 +67,6 @@ function action_set(prim::Primitives, smm_params::smm_parameters)
     end
     return actions 
 end
-
-# Added a new comment here
 
 function HH_types(prim::Primitives, smm_params::smm_parameters, 
                   sc_active::Bool)

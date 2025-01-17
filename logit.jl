@@ -68,7 +68,10 @@ function gen_mean_var_by_hh(prim::Primitives, smm_params::smm_parameters,
     tmoms_nowork = [(zeros(4), zeros(4)) for _ in 1:N_hh]
     # Stores moments for employment for all HHs
     moms_emp = [(zeros(2), zeros(2)) for _ in 1:N_hh]
-
+    # Need to find the indices where both work and where both don't work
+    # which are later used to subset actions 
+    both_working_min = findfirst(==(1), [actions[i][1]*actions[i][2] for i in eachindex(actions)])
+    both_notworking_max = findlast(==(0), [actions[i][1]+actions[i][2] for i in eachindex(actions)])
     Threads.@threads for i in 1:N_hh
         
         (wm, wf, loc, sc) = hh_types[i]
@@ -86,9 +89,9 @@ function gen_mean_var_by_hh(prim::Primitives, smm_params::smm_parameters,
         # Calculating time moments for working couples and not working couples 
         # Get indices where both work/don't work 
         time_hh = [actions_hh[j][3:6] for j in eachindex(actions_hh)]
-        both_working_idxs = actions_idxs[actions_idxs .> N_l^2 + 2*Nl_work*N_l]
+        both_working_idxs = actions_idxs[actions_idxs .>= both_working_min]
 
-        both_notworking_idxs = actions_idxs[actions_idxs .<= N_l^2]
+        both_notworking_idxs = actions_idxs[actions_idxs .<= both_notworking_max]
         # Have to check whether it is empty or not. 
         # If there is only one index, var is vacuously 0. So including that too.
         if length(both_working_idxs) <= 1
@@ -130,6 +133,8 @@ function gen_moments_by_hh(prim::Primitives, smm_params::smm_parameters,
     tmoms_nowork = [(zeros(4), zeros(4)) for _ in 1:N_hh]
     # Stores moments for employment for all HHs
     moms_emp = [(zeros(2), zeros(2)) for _ in 1:N_hh] 
+    both_working_min = findfirst(==(1), [actions[i][1]*actions[i][2] for i in eachindex(actions)])
+    both_notworking_max = findlast(==(0), [actions[i][1]+actions[i][2] for i in eachindex(actions)])
     Threads.@threads for i in 1:N_hh
         (wm, wf, loc, sc) = hh_types[i]
         hh = HH_Type(wm, wf, loc, sc)
@@ -152,9 +157,8 @@ function gen_moments_by_hh(prim::Primitives, smm_params::smm_parameters,
         # Calculating time moments for working couples and not working couples 
         # Get indices where both work/don't work 
         time_hh = [actions_hh[j][3:6] for j in eachindex(actions_hh)]
-        both_working_idxs = actions_idxs[actions_idxs .> N_l^2 + 2*Nl_work*N_l]
-
-        both_notworking_idxs = actions_idxs[actions_idxs .<= N_l^2]
+        both_working_idxs = actions_idxs[actions_idxs .>= both_working_min]
+        both_notworking_idxs = actions_idxs[actions_idxs .<= both_notworking_max]
         # Have to check whether it is empty or not 
         if length(both_working_idxs) <= 1
             tmoms_work[i] = (-99*ones(4), -99*ones(4))

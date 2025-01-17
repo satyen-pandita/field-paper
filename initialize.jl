@@ -33,7 +33,8 @@ using LinearAlgebra;
     # Leisure grid
     # N_l::Int64 = 30
     dl::Float64 = 0.1
-    Nl_work = Int(round((1.0-h)/dl))
+    Nl_work_m = Int(round((1.0-hm)/dl))
+    Nl_work_f = Int(round((1.0-hf)/dl))
     N_l = Int(round(1.0/dl))
     # Wage Grid
     N_w::Int64 = 30
@@ -59,7 +60,7 @@ using LinearAlgebra;
     # Ordering: sc = 0, sc > 0, sc = ∞
     
     # HH_wts_stigma = Dict("North" => [0.62, 0.18, 0.20], "South" => [0.55, 0.15, 0.30])
-    HH_wts_stigma = Dict("North" => [0.62, 0.18, 0.20], "South" => [1.0, 0.0, 0.0])
+    HH_wts_stigma = Dict("North" => [0.62, 0.38, 0.0], "South" => [0.55, 0.45, 0.0])
     
 end
                            
@@ -87,12 +88,12 @@ end
 
 
 function Initialize(guess::Vector{Float64}, 
-                    sc_active::Bool, home_prod::Bool=false)
+                    sc_active::Bool, home_prod::Bool=false, eta_vec::Vector{Float64}=[1/3, 1/3])
     prim = Primitives()
     if sc_active
         if home_prod
             A_m, A_f, sc_north, sc_south = guess
-            η_m, η_f = 1/3, 1/3
+            η_m, η_f = eta_vec
         else 
             η_m, η_f, sc_north, sc_south = guess
             A_m, A_f = 1., 1.
@@ -100,7 +101,7 @@ function Initialize(guess::Vector{Float64},
     else 
         if home_prod
             A_m, A_f = guess
-            η_m, η_f = 1/3, 1/3
+            η_m, η_f = eta_vec
         else 
             η_m, η_f = guess
             A_m, A_f = 1.0, 1.0
