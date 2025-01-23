@@ -169,11 +169,16 @@ end
 
 
 function optim_func(guess::Vector{Float64}, 
-                    sc_active::Bool, home_prod::Bool, eta_vec::Vector{Float64})
+                    sc_active::Bool, H_flag::Bool=false)
     if minimum(guess) < 0 
         return 1e15
     end
-    prim, smm_params = Initialize(guess, sc_active, home_prod, eta_vec)
+    if H_flag
+        if guess[1] > 1
+            return 1e15
+        end
+    end
+    prim, smm_params = Initialize(guess, sc_active, H_flag)
     emp_mean_dict, emp_var_dict, time_alloc_mean_dict, time_alloc_var_dict = gen_moments(prim, smm_params, sc_active);    
     mean_vec = vcat(time_alloc_mean_dict["work"], emp_mean_dict["North"], emp_mean_dict["South"])
     err = sum(mean_vec.^2)
@@ -181,11 +186,11 @@ function optim_func(guess::Vector{Float64},
 end
 
 function optim_func_w_optimal_weights(guess::Vector{Float64}, var::Vector{Float64}, 
-                                      sc_active::Bool, home_prod::Bool, eta_vec::Vector{Float64})
+                                      sc_active::Bool, H_flag::Bool=false)  
     if minimum(guess) < 0 
         return 1e15
     end
-    prim, smm_params = Initialize(guess, sc_active, home_prod, eta_vec)
+    prim, smm_params = Initialize(guess, sc_active, H_flag)
     emp_mean_dict, emp_var_dict, time_alloc_mean_dict, time_alloc_var_dict = gen_moments(prim, smm_params, sc_active);
     
     mean_vec = vcat(time_alloc_mean_dict["work"], emp_mean_dict["North"], emp_mean_dict["South"])

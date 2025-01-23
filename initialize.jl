@@ -1,7 +1,7 @@
-using Pkg
-Pkg.add(["SharedArrays", "Parameters", "Distributions", "Random", 
-            "Serialization", "Optim", "StatsBase", "Statistics", "BenchmarkTools", "LinearAlgebra"])
-using SharedArrays
+# using Pkg
+# Pkg.add(["SharedArrays", "Parameters", "Distributions", "Random", 
+#             "Serialization", "Optim", "StatsBase", "Statistics", "BenchmarkTools", "LinearAlgebra"])
+
 using Parameters
 using Distributions 
 using Random
@@ -9,7 +9,6 @@ using Serialization
 using Optim
 using StatsBase
 using Statistics
-using BenchmarkTools;
 using LinearAlgebra;
 
 # Random.seed!(12345)
@@ -61,7 +60,6 @@ using LinearAlgebra;
     
     # HH_wts_stigma = Dict("North" => [0.62, 0.18, 0.20], "South" => [0.55, 0.15, 0.30])
     HH_wts_stigma = Dict("North" => [0.62, 0.38, 0.0], "South" => [0.55, 0.45, 0.0])
-    
 end
                            
 # These parameters will be estimated using SMM
@@ -69,11 +67,11 @@ end
     # Home prod params 
     A_m::Float64
     A_f::Float64
-    
-    # Leisure Params 
-    η_m::Float64
-    η_f::Float64
-    
+    # Leisure Params
+    # η_m = η_f = η 
+    η::Float64
+    # Utility home parameter 
+    η_H::Float64    
     # stigma cost params
     sc_north::Float64
     sc_south::Float64
@@ -88,29 +86,38 @@ end
 
 
 function Initialize(guess::Vector{Float64}, 
-                    sc_active::Bool, home_prod::Bool=false, eta_vec::Vector{Float64}=[1/3, 1/3])
+                    sc_active::Bool, H_flag::Bool=false)
     prim = Primitives()
+    # If H_flag is true, then we are estimating η_H, "a" such that A_m = a and A_f = 1-a, and η. 
+    # If H_flag is false, then η_H = 1.0, A_m = 1, and A_f and η is estimated. 
     if sc_active
-        if home_prod
-            A_m, A_f, sc_north, sc_south = guess
-            η_m, η_f = eta_vec
+        if H_flag
+            a, η, η_H, sc_north, sc_south = guess
+            A_m = a
+            A_f = 1.0 - a
         else 
-            η_m, η_f, sc_north, sc_south = guess
-            A_m, A_f = 1., 1.
-        end        
+            # A_m = 1.0
+            η_H = 1.0
+            a, η, sc_north, sc_south = guess
+            A_m = a
+            A_f = 1.0 - a
+        end
     else 
-        if home_prod
-            A_m, A_f = guess
-            η_m, η_f = eta_vec
+        if H_flag
+            a, η, η_H = guess
+            A_m = a
+            A_f = 1.0 - a
         else 
-            η_m, η_f = guess
-            A_m, A_f = 1.0, 1.0
+            # A_m = 1.0
+            η_H = 1.0
+            a, η = guess
+            A_m = a 
+            A_f = 1.0-a 
         end
         sc_north = 0.0
         sc_south = 0.0
     end
-    # A_m, A_f = 1.0, 1.0
-    smm_params = smm_parameters(A_m, A_f, η_m, η_f, sc_north, sc_south)
+    smm_params = smm_parameters(A_m, A_f, η, η_H, sc_north, sc_south)
     return prim, smm_params
 end
 
