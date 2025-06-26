@@ -17,25 +17,28 @@ function prob_actions_hh(prim::Primitives, smm_params::smm_parameters,
     nactions = length(actions);
     # For each of these actions, calculate income, home production 
     # Consumption and finally, utilities 
-    incomes = [wm*actions[i][1] + wf*actions[i][2] for i in 1:nactions]
+    incomes = [wm*actions[i][1]*hm + wf*actions[i][2]*hf for i in 1:nactions]
     homeProds = [H(prim, smm_params, actions[i][5], actions[i][6], incomes[i]) for i in 1:nactions]
     conss = [c(prim, incomes[i], homeProds[i]) for i in 1:nactions]
     utils = [u(prim, smm_params, hh_type, conss[i], 
-             actions[i][3], actions[i][4], actions[i][6]) for i in 1:nactions]
+             actions[i][3], actions[i][4], actions[i][6], homeProds[i]) for i in 1:nactions]
     # Exponentiate Utilities 
     exp_utils = [exp(util) for util in utils]
     if sum(exp_utils) == 0
-        rest_idx = findfirst(==([0.0,0.0,1.0,1.0,0.0,0.0]), actions)
+
         probs = zeros(nactions)
-        probs[rest_idx] = 1.0
-    else
+        # If all probs are 0, then return p = 1 on action where leisure is 1
+        act_rest = findfirst(==([0.0,0.0,1.0,1.0,0.0,0.0]), actions)
+        probs[act_rest] = 1.0
+    else 
+
         # Find probability of each action 
         probs = [e/(sum(exp_utils)) for e in exp_utils]
     end
     return probs
 end
 
-# Draw N draws from the probab distribution obtained from prob_actions_hh for each HH
+# Draw N draws from the prob distribution obtained from prob_actions_hh for each HH
 function action_idx_hh(prim::Primitives, smm_params::smm_parameters,
     hh_type::HH_Type, N::Int64=500)
     @unpack_Primitives prim
@@ -67,7 +70,10 @@ function gen_mean_var_by_hh(prim::Primitives, smm_params::smm_parameters,
     tmoms_nowork = [(zeros(4), zeros(4)) for _ in 1:N_hh]
     # Stores moments for employment for all HHs
     moms_emp = [(zeros(2), zeros(2)) for _ in 1:N_hh]
-
+    # Need to find the indices where both work and where both don't work
+    # which are later used to subset actions 
+    both_working_min = findfirst(==(1), [actions[i][1]*actions[i][2] for i in eachindex(actions)])
+    both_notworking_max = findlast(==(0), [actions[i][1]+actions[i][2] for i in eachindex(actions)])
     Threads.@threads for i in 1:N_hh
         
         (wm, wf, loc, sc) = hh_types[i]
@@ -85,9 +91,9 @@ function gen_mean_var_by_hh(prim::Primitives, smm_params::smm_parameters,
         # Calculating time moments for working couples and not working couples 
         # Get indices where both work/don't work 
         time_hh = [actions_hh[j][3:6] for j in eachindex(actions_hh)]
-        both_working_idxs = actions_idxs[actions_idxs .> N_l^2 + 2*Nl_work*N_l]
+        both_working_idxs = actions_idxs[actions_idxs .>= both_working_min]
 
-        both_notworking_idxs = actions_idxs[actions_idxs .<= N_l^2]
+        both_notworking_idxs = actions_idxs[actions_idxs .<= both_notworking_max]
         # Have to check whether it is empty or not. 
         # If there is only one index, var is vacuously 0. So including that too.
         if length(both_working_idxs) <= 1
@@ -129,6 +135,8 @@ function gen_moments_by_hh(prim::Primitives, smm_params::smm_parameters,
     tmoms_nowork = [(zeros(4), zeros(4)) for _ in 1:N_hh]
     # Stores moments for employment for all HHs
     moms_emp = [(zeros(2), zeros(2)) for _ in 1:N_hh] 
+    both_working_min = findfirst(==(1), [actions[i][1]*actions[i][2] for i in eachindex(actions)])
+    both_notworking_max = findlast(==(0), [actions[i][1]+actions[i][2] for i in eachindex(actions)])
     Threads.@threads for i in 1:N_hh
         (wm, wf, loc, sc) = hh_types[i]
         hh = HH_Type(wm, wf, loc, sc)
@@ -151,9 +159,8 @@ function gen_moments_by_hh(prim::Primitives, smm_params::smm_parameters,
         # Calculating time moments for working couples and not working couples 
         # Get indices where both work/don't work 
         time_hh = [actions_hh[j][3:6] for j in eachindex(actions_hh)]
-        both_working_idxs = actions_idxs[actions_idxs .> N_l^2 + 2*Nl_work*N_l]
-
-        both_notworking_idxs = actions_idxs[actions_idxs .<= N_l^2]
+        both_working_idxs = actions_idxs[actions_idxs .>= both_working_min]
+        both_notworking_idxs = actions_idxs[actions_idxs .<= both_notworking_max]
         # Have to check whether it is empty or not 
         if length(both_working_idxs) <= 1
             tmoms_work[i] = (-99*ones(4), -99*ones(4))
